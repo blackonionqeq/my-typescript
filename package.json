@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "yarn tsc && node --inspect-brk ./with-digital-version/runner"
+    "test": "yarn tsc && node --inspect-brk ./with-scope-version/runner"
   },
   "keywords": [],
   "author": "",

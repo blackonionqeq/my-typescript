@@ -1,4 +1,6 @@
-import { AstVisitor, BinaryExpression, FunctionCall, Variable, VariableDecl } from "./abstract-syntac-tree";
+import { AstVisitor, BinaryExpression, FunctionCall, Variable, VariableDecl, Prog } from "./abstract-syntac-tree";
+import { Scope } from "./scope";
+import { Symbol } from "./semantic-analyzer";
 
 class LeftValue {
   /** 
@@ -11,7 +13,12 @@ class LeftValue {
 }
 
 export class Interpretor extends AstVisitor {
-  valueTable = new Map<string, unknown>()
+  currentScope: Scope<Symbol>|null = null
+  visitProg(prog: Prog) {
+    this.currentScope = prog.scope
+    super.visitProg(prog)
+    this.currentScope = null
+  }
   // 覆盖父级行为
   visitFunctionDecl() {}
   visitFunctionCall(functionCall: FunctionCall) {
@@ -28,7 +35,10 @@ export class Interpretor extends AstVisitor {
       console.log(...res)
     } else {
       if (functionCall.defination) {
+        const tmpScope = this.currentScope
+        this.currentScope = functionCall.defination.scope
         this.visitBlock(functionCall.defination.body)
+        this.currentScope = tmpScope
       }
     }
   }
@@ -122,9 +132,12 @@ export class Interpretor extends AstVisitor {
     return new LeftValue(variable)
   }
   getVariableValue(vName: string) {
-    return this.valueTable.get(vName)
+    return this.currentScope?.getRecord(vName)!.value
+    // return this.valueTable.get(vName)
   }
   setVariableValue(vName: string, value: unknown) {
-    return this.valueTable.set(vName, value)
+    const record = this.currentScope?.getRecord(vName)
+    if (record) record.value = value
+    // return this.valueTable.set(vName, value)
   }
 }

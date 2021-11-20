@@ -1,3 +1,5 @@
+import { Scope } from "./scope"
+
 export abstract class AstNode {
   // 打印子树信息，用于缩进显示
   abstract dump(prefix: string): void
@@ -85,6 +87,7 @@ export class ExpressionStatement extends Statement {
 }
 
 export abstract class Decl extends Statement {
+  scope!: Scope
   constructor(public name: string) {super()}
 }
 
@@ -190,6 +193,7 @@ export class Block extends AstNode {
 }
 
 export class Prog extends Block {
+  scope!: Scope
   dump(prefix: string) {
     console.log(`${prefix}Prog`)
     console.log(this.stmts.map(i => i.dump(`${prefix}\t`)).join('\n'))
